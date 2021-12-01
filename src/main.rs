@@ -1,10 +1,20 @@
-async fn print_hello() {
-    println!("Hello, world!");
+use tokio::{runtime::Runtime, time::{sleep, Duration}};
+
+async fn print1() {
+    sleep(Duration::from_secs(2)).await;
+    println!("[1]");
+}
+
+async fn print2() {
+    println!("[2]");
 }
 
 fn main() -> std::io::Result<()> {
-    let rt = tokio::runtime::Runtime::new()?;
-    rt.block_on(print_hello());
+    let rt = Runtime::new()?;
+    rt.block_on(async {
+        print1().await;
+        print2().await
+    });
     Ok(())
 }
 
