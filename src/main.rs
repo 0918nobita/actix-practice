@@ -1,52 +1,30 @@
-use actix::{Actor, Context, System};
+use actix::{Actor, Context, Handler, Message};
 
-struct MyActor;
+#[derive(Message)]
+#[rtype(result = "usize")]
+struct Sum(usize, usize);
 
-impl Actor for MyActor {
+struct Calculator;
+
+impl Actor for Calculator {
     type Context = Context<Self>;
+}
 
-    fn started(&mut self, _ctx: &mut Self::Context) {
-        println!("I am alive!");
-        System::current().stop();
+impl Handler<Sum> for Calculator {
+    type Result = usize;
+
+    fn handle(&mut self, msg: Sum, _ctx: &mut Context<Self>) -> Self::Result {
+        msg.0 + msg.1
     }
 }
 
-fn main() -> std::io::Result<()> {
-    let system = System::new();
-    system.block_on(async { MyActor.start() });
-    system.run()
+#[actix::main] // <- starts the actor system and blocks until future resolves
+async fn main() {
+    let addr = Calculator.start();
+
+    if let Ok(res) = addr.send(Sum(3, 4)).await {
+        println!("Sum: {}", res);
+    } else {
+        eprintln!("Communication to the actor has failed");
+    }
 }
-
-/*
-use tokio::{
-    runtime::Runtime,
-    task,
-    time::{sleep, Duration},
-};
-
-async fn print1() {
-    sleep(Duration::from_secs(2)).await;
-    println!("[1]");
-}
-
-async fn print2() {
-    println!("[2]");
-}
-*/
-
-/*
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
-
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
-}
-
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(hello))
-        .bind("127.0.0.1:8080")?
-        .run()
-        .await
-}
-*/
