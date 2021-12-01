@@ -1,3 +1,23 @@
+use actix::{Actor, Context, System};
+
+struct MyActor;
+
+impl Actor for MyActor {
+    type Context = Context<Self>;
+
+    fn started(&mut self, _ctx: &mut Self::Context) {
+        println!("I am alive!");
+        System::current().stop();
+    }
+}
+
+fn main() -> std::io::Result<()> {
+    let system = System::new();
+    system.block_on(async { MyActor.start() });
+    system.run()
+}
+
+/*
 use tokio::{
     runtime::Runtime,
     task,
@@ -12,16 +32,7 @@ async fn print1() {
 async fn print2() {
     println!("[2]");
 }
-
-fn main() -> std::io::Result<()> {
-    let rt = Runtime::new()?;
-    rt.block_on(async {
-        let future = task::spawn(print1());
-        print2().await;
-        future.await.unwrap();
-    });
-    Ok(())
-}
+*/
 
 /*
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};

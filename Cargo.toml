@@ -5,7 +5,8 @@ edition = "2018"
 
 [dependencies]
 # actix-web = "3"
+actix = "0.12"
 
-[dependencies.tokio]
-version = "1"
-features = ["full"]
+# [dependencies.tokio]
+# version = "1"
+# features = ["full"]
