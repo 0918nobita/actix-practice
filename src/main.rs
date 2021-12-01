@@ -1,4 +1,8 @@
-use tokio::{runtime::Runtime, time::{sleep, Duration}};
+use tokio::{
+    runtime::Runtime,
+    task,
+    time::{sleep, Duration},
+};
 
 async fn print1() {
     sleep(Duration::from_secs(2)).await;
@@ -12,8 +16,9 @@ async fn print2() {
 fn main() -> std::io::Result<()> {
     let rt = Runtime::new()?;
     rt.block_on(async {
-        print1().await;
-        print2().await
+        let future = task::spawn(print1());
+        print2().await;
+        future.await.unwrap();
     });
     Ok(())
 }
